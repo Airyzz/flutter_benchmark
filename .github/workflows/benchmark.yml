@@ -1,5 +1,12 @@
-on: push
+on: 
+  push:
+  workflow_dispatch:
+
 name: benchmark
+
+permissions:
+  contents: write
+  deployments: write
 
 jobs:
   integration-test:
@@ -41,4 +48,23 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: result.mkv
-          path: video.mkv   
+          path: video.mkv  
+
+      - name: Download previous benchmark data
+        uses: actions/cache@v4
+        with:
+          path: ./cache
+          key: ${{ runner.os }}-benchmark
+
+      - name: Store benchmark result - separate results repo
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: Go Benchmark
+          tool: 'customSmallerIsBetter'
+          output-file-path: build/customSmallerIsBetter.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '200%'
+          comment-on-alert: true
+          fail-on-alert: true
