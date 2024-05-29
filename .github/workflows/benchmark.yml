@@ -1,0 +1,44 @@
+on: push
+name: benchmark
+
+jobs:
+  integration-test:
+    name: Integration Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+        
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.8.0
+        with:
+          flutter-version: '3.19.5'
+          channel: 'stable'
+
+      - name: Setup Dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ninja-build libgtk-3-dev libolm3 libmpv-dev mpv ffmpeg libmimalloc-dev
+
+
+      - name: Configure Flutter
+        run: flutter config --enable-linux-desktop
+        
+      - name: Benchmark
+        run: |
+          export DISPLAY=:99
+          sudo Xvfb -ac :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+          ffmpeg -f x11grab -video_size 1920x1080 -framerate 15 -i :99 -vcodec libx264 -preset ultrafast -qp 0 -nostdin -loglevel quiet -pix_fmt yuv444p video.mkv &
+          flutter drive --driver=test_driver/benchmark_driver.dart --target=integration_test\scrolling_test.dart --profile  
+          INTEGRATION_TEST_EXIT_CODE=$?
+          sleep 1
+          kill $(pgrep ffmpeg)
+          exit $INTEGRATION_TEST_EXIT_CODE
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: result.mkv
+          path: commet/video.mkv   
