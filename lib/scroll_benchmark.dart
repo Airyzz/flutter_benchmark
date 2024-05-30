@@ -33,6 +33,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final int count = 500;
 
+  int fibonacci(int n) {
+    if (n <= 1) {
+      return n;
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,7 +58,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: ((index % 5) + 1) * 20,
                 child: Center(
                   child: Text(
-                    'Item: $index',
+                    // Intentionally try to make this slow, i want to see the impact on build time!
+                    'Item: $index  fib: ${fibonacci(30)}',
                     key: index == count - 1 ? ValueKey("end") : null,
                   ),
                 ),
