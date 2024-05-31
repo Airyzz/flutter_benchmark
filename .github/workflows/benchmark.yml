@@ -1,5 +1,6 @@
 on: 
-  push:
+  merge_group:
+  pull_request:
   workflow_dispatch:
 
 name: benchmark
@@ -62,4 +63,5 @@ jobs:
           alert-threshold: '150%'
           comment-on-alert: true
           fail-on-alert: true
+          summary-always: true
           gh-repository: 'github.com/Airyzz/flutter_benchmark_results'
