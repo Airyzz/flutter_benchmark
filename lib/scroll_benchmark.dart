@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Center(
                   child: Text(
                     // Intentionally try to make this slow, i want to see the impact on build time!
-                    'Item: $index  fib: ${fibonacci(30)}',
+                    'Item: $index  fib: ${fibonacci(1)}',
                     key: index == count - 1 ? ValueKey("end") : null,
                   ),
                 ),
